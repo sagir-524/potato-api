@@ -4,6 +4,7 @@ import { mailQueue } from "../../queues/mail.queue";
 import { redis } from "../../redis";
 import { User, user } from "../users/users.model";
 import { init } from "@paralleldrive/cuid2";
+import jwt from "jsonwebtoken";
 
 export const sendUserVerificationMail = async (user: User): Promise<void> => {
   const cuid = init({ length: 32 })();
@@ -42,4 +43,30 @@ export const verifyUser = async (
   }
 
   return false;
+};
+
+export const getTokens = async (user: User) => {
+  const payload = {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+  };
+
+  const token = jwt.sign(payload, process.env.JWT_SECRET as string, {
+    algorithm: "HS256",
+    expiresIn: "15m",
+  });
+
+  const refreshToken = jwt.sign(payload, process.env.JWT_SECRET as string, {
+    algorithm: "HS512",
+    expiresIn: "2d",
+  });
+
+  await redis.setex(
+    `user:${user.id}:refresh-token:${token}`,
+    60 * 60 * 24 * 2,
+    user.email
+  );
+
+  return { token, refreshToken, user };
 };

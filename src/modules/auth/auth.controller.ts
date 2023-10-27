@@ -3,11 +3,13 @@ import { registerSchema } from "./schemas/register.schema";
 import { asyncHandler } from "../../helpers/async-handler";
 import { stripPassword } from "../../helpers/strip-password";
 import { createUser, getUser } from "../users/users.service";
-import { sendUserVerificationMail, verifyUser } from "./auth.service";
+import { getTokens, sendUserVerificationMail, verifyUser } from "./auth.service";
 import { z } from "zod";
 import { NotFoundException } from "../../exceptions/not-found.exception";
 import { verifyUserSchema } from "./schemas/verify-user.schema";
 import { BadRequestException } from "../../exceptions/bad-request.exception";
+import { loginSchema } from "./schemas/login.schema";
+import { compare } from "bcrypt";
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const data = await registerSchema.parseAsync(req.body);
@@ -49,4 +51,20 @@ export const verify = asyncHandler(async (req: Request, res: Response) => {
   }
   
   res.sendStatus(204);
+});
+
+export const login = asyncHandler(async (req: Request, res: Response) => {
+  const { email, password } = await loginSchema.parseAsync(req.body);
+  const user = await getUser('email', email, undefined, false);
+
+  if (user && !user.verifiedAt) {
+    throw new BadRequestException('Email is not verified.', { verified: false });
+  }
+
+  if (!user || !compare(password, user.password)) {
+    throw new BadRequestException('Email or password didn\'t match');
+  }
+
+  const data = await getTokens(user);
+  res.status(200).json({...data, user: stripPassword(data.user)});
 });

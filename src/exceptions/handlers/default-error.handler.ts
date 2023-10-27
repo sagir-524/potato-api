@@ -9,14 +9,17 @@ export const defaultErrorHandler: ErrorRequestHandler = (
   next: NextFunction
 ) => {
   let status = 500;
+  let extra: any | undefined;
 
   if (err instanceof NotFoundException) {
     status = 404;
   } else if (err instanceof BadRequestException) {
     status = 400;
+    extra = err.extra;
   }
 
-  return res.status(status).json({
+  res.status(status).json({
     message: err.message || "Something went wrong. Please try again later.",
+    extra
   });
 };
