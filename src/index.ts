@@ -7,6 +7,7 @@ import morgan from "morgan";
 import { errorLogHandler } from "./exceptions/handlers/error-log.handler";
 import { zodErrorhandler } from "./exceptions/handlers/zod-error.handler";
 import { authRouter } from "./modules/auth/auth.routes";
+import { defaultErrorHandler } from "./exceptions/handlers/default-error.handler";
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use('/auth', authRouter);
 
 app.use(errorLogHandler);
 app.use(zodErrorhandler);
+app.use(defaultErrorHandler);
 
 app.listen(process.env.APP_PORT, () => {
   console.log(`Application is running on ${process.env.APP_URL}`);
