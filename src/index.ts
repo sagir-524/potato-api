@@ -8,6 +8,7 @@ import { errorLogHandler } from "./exceptions/handlers/error-log.handler";
 import { zodErrorhandler } from "./exceptions/handlers/zod-error.handler";
 import { authRouter } from "./modules/auth/auth.routes";
 import { defaultErrorHandler } from "./exceptions/handlers/default-error.handler";
+import { NotFoundException } from "./exceptions/not-found.exception";
 
 dotenv.config();
 
@@ -20,8 +21,11 @@ app.use(helmet());
 app.use(cors());
 app.use(morgan("tiny"));
 
-app.get('/ping', (req: Request, res: Response) => res.send('pong'));
-app.use('/auth', authRouter);
+app.get("/ping", (req: Request, res: Response) => res.send("pong"));
+app.use("/auth", authRouter);
+app.all("*", () => {
+  throw new NotFoundException();
+});
 
 app.use(errorLogHandler);
 app.use(zodErrorhandler);

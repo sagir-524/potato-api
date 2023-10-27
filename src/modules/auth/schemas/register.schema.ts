@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { db } from "../../../db/db";
+import { db } from "../../../db";
 import { user } from "../../users/users.model";
 import { eq } from "drizzle-orm";
 
