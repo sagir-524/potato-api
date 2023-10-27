@@ -34,12 +34,12 @@ export type User = typeof user.$inferSelect;
 
 export const verifiedUserScope = and(
   isNotNull(user.verifiedAt),
-  gte(user.verifiedAt, sql`now()`)
+  lt(user.verifiedAt, sql`now()`)
 );
 
 export const unverifiedUserScope = or(
   isNull(user.verifiedAt),
-  lt(user.verifiedAt, sql`now()`)
+  gte(user.verifiedAt, sql`now()`)
 );
 
 export const deletedUserScope = and(

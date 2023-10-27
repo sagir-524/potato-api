@@ -10,6 +10,7 @@ import { verifyUserSchema } from "./schemas/verify-user.schema";
 import { BadRequestException } from "../../exceptions/bad-request.exception";
 import { loginSchema } from "./schemas/login.schema";
 import { compare } from "bcrypt";
+import { User } from "../users/users.model";
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const data = await registerSchema.parseAsync(req.body);
@@ -68,3 +69,8 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   const data = await getTokens(user);
   res.status(200).json({...data, user: stripPassword(data.user)});
 });
+
+export const profile = (req: Request, res: Response) => {
+  const profile = stripPassword(req.user as User);
+  res.status(200).json(profile);
+};

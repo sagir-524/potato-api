@@ -9,6 +9,8 @@ import { zodErrorhandler } from "./exceptions/handlers/zod-error.handler";
 import { authRouter } from "./modules/auth/auth.routes";
 import { defaultErrorHandler } from "./exceptions/handlers/default-error.handler";
 import { NotFoundException } from "./exceptions/not-found.exception";
+import passport from "passport";
+import { jwtStrategy } from "./modules/auth/strategies/jwt.strategy";
 
 dotenv.config();
 
@@ -20,6 +22,9 @@ app.use(compression());
 app.use(helmet());
 app.use(cors());
 app.use(morgan("tiny"));
+
+passport.use(jwtStrategy);
+app.use(passport.initialize());
 
 app.get("/ping", (req: Request, res: Response) => res.send("pong"));
 app.use("/auth", authRouter);
