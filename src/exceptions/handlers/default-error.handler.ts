@@ -1,6 +1,7 @@
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import { NotFoundException } from "../not-found.exception";
 import { BadRequestException } from "../bad-request.exception";
+import { ForbiddenException } from "../forbidder.exception";
 
 export const defaultErrorHandler: ErrorRequestHandler = (
   err: any,
@@ -16,6 +17,8 @@ export const defaultErrorHandler: ErrorRequestHandler = (
   } else if (err instanceof BadRequestException) {
     status = 400;
     extra = err.extra;
+  } else if (err instanceof ForbiddenException) {
+    status = 403;
   }
 
   res.status(status).json({
