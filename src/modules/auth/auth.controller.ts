@@ -16,7 +16,7 @@ import { BadRequestException } from "../../exceptions/bad-request.exception";
 import { loginSchema } from "./schemas/login.schema";
 import { compare } from "bcrypt";
 import { User } from "../users/user.model";
-import jwt, { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
+import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const data = await registerSchema.parseAsync(req.body);
@@ -70,7 +70,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     });
   }
 
-  if (!user || !compare(password, user.password)) {
+  if (!user || !(await compare(password, user.password))) {
     throw new BadRequestException("Email or password didn't match");
   }
 
