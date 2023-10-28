@@ -31,7 +31,12 @@ app.use(passport.initialize());
 app.get("/ping", (req: Request, res: Response) => res.send("pong"));
 app.use("/auth", authRouter);
 
-app.use('/admin/roles', isAdmin, rolesRouter);
+app.use(
+  "/admin/roles",
+  passport.authenticate("jwt", { session: false }),
+  isAdmin,
+  rolesRouter
+);
 
 app.all("*", () => {
   throw new NotFoundException();

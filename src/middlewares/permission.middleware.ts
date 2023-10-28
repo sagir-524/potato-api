@@ -11,11 +11,12 @@ import { ForbiddenException } from "../exceptions/forbidder.exception";
 
 export const checkPermissions = (permissions: string[]): RequestHandler => {
   return async (req: Request, res: Response, next: NextFunction) => {
+    console.log(req.user);
     if (req.user) {
       const { id, isAdmin, isSuperAdmin } = req.user as User;
 
       if (isSuperAdmin) {
-        next();
+        return next();
       } else if (isAdmin) {
         const result = await db
           .select({ slug: permissionModel.slug })
@@ -37,11 +38,15 @@ export const checkPermissions = (permissions: string[]): RequestHandler => {
           .execute();
 
         if (result.length === permissions.length) {
-          next();
+          return next();
         }
       }
     }
 
-    throw new ForbiddenException('You do not have sufficient permisions to perform this action.');
+    return next(
+      new ForbiddenException(
+        "You do not have sufficient permisions to perform this action."
+      )
+    );
   };
 };

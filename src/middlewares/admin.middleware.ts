@@ -7,9 +7,13 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
     const { isAdmin, isSuperAdmin } = req.user as User;
 
     if (isAdmin || isSuperAdmin) {
-      next();
+      return next();
     }
   }
 
-  throw new ForbiddenException('You do not have sufficient permisions to perform this action.');
+  return next(
+    new ForbiddenException(
+      "You do not have sufficient permisions to perform this action."
+    )
+  );
 };

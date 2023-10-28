@@ -22,6 +22,8 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
         .values(
           permissions.map((permissionId) => ({ permissionId, roleId: role.id }))
         );
+
+      return role;
     });
 
     res.status(201).json(role);

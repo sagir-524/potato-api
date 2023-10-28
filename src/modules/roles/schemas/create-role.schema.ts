@@ -23,7 +23,7 @@ export const createRoleSchema = z.object({
           .limit(1)
           .execute();
 
-        return res.length === 1;
+        return res.length === 0;
       },
       {
         message: "Role already exisits",
@@ -32,8 +32,17 @@ export const createRoleSchema = z.object({
     ),
   description: z.string().trim().optional(),
   permissions: z
-    .array(z.number())
-    .min(1)
+    .array(
+      z
+        .string()
+        .or(z.number())
+        .transform(Number)
+        .refine((value) => !isNaN(value), {
+          message: "Permission value must be a number",
+          path: ["permissions"],
+        })
+    )
+    .nonempty()
     .refine(
       async (permissions) => {
         const res = await db
