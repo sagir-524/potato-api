@@ -11,7 +11,7 @@ import {
 import { integer, pgTable, primaryKey, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
 import { roleModel } from "../roles/role.model";
 
-export const permissionModel = pgTable("roles", {
+export const permissionModel = pgTable("permissions", {
   id: serial("id").primaryKey().notNull(),
   name: varchar("name", { length: 80 }).notNull(),
   slug: varchar("slug", { length: 80 }).unique().notNull(),

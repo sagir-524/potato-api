@@ -14,6 +14,6 @@ export default {
     database: process.env.PG_DATABASE as string,
     ssl: true,
   },
-  out: './drizzle',
+  out: './drizzle/migrations',
   strict: true,
 } satisfies Config;
