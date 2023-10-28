@@ -1,7 +1,9 @@
 import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { user } from "../modules/users/users.model";
 import dotenv from "dotenv";
+import { userModel } from "../modules/users/user.model";
+import { roleModel, roleToUserModel } from "../modules/roles/role.model";
+import { permissionModel, permissionToRoleModel } from "../modules/permissions/permission.model";
 
 dotenv.config();
 
@@ -23,5 +25,11 @@ pool.on("error", (err) => {
 
 export const db = drizzle(pool, {
   logger: true,
-  schema: { user },
+  schema: {
+    user: userModel,
+    role: roleModel,
+    permission: permissionModel,
+    roleToUse: roleToUserModel,
+    permissionToRole: permissionToRoleModel,
+  },
 });

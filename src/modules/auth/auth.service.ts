@@ -2,7 +2,7 @@ import { eq, sql } from "drizzle-orm";
 import { db } from "../../db";
 import { mailQueue } from "../../queues/mail.queue";
 import { redis } from "../../redis";
-import { User, user } from "../users/users.model";
+import { User, userModel } from "../users/user.model";
 import { init } from "@paralleldrive/cuid2";
 import jwt from "jsonwebtoken";
 
@@ -27,9 +27,9 @@ export const verifyUser = async (
 
   if (res === email) {
     const dbRes = await db
-      .update(user)
-      .set({ verifiedAt: sql`now()` })
-      .where(eq(user.id, id))
+      .update(userModel)
+      .set({ verifiedAt: sql`now()`, updatedAt: sql`now()` })
+      .where(eq(userModel.id, id))
       .returning()
       .execute();
 

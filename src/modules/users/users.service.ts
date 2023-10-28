@@ -1,13 +1,13 @@
 import { hash } from "bcrypt";
 import { db } from "../../db";
-import { User, activeUserScope, deletedUserScope, unverifiedUserScope, user, verifiedUserScope } from "./users.model";
-import { SQL, SQLWrapper, and, eq } from "drizzle-orm";
+import { User, activeUserScope, deletedUserScope, unverifiedUserScope, userModel, verifiedUserScope } from "./user.model";
+import { SQL, and, eq } from "drizzle-orm";
 
 export const createUser = async (
   data: Pick<User, "name" | "email" | "password">
 ): Promise<User> => {
   const [newUser] = await db
-    .insert(user)
+    .insert(userModel)
     .values([
       {
         name: data.name,
@@ -28,7 +28,7 @@ export const getUser = async <T extends keyof Pick<User, "id" | "email">>(
   verified?: boolean,
   deleted?: boolean,
 ): Promise<User | undefined> => {
-  const column = user[findBy];
+  const column = userModel[findBy];
 
   const filters: Array<SQL<unknown> | undefined> = [];
 

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { db } from "../../../db";
-import { user } from "../../users/users.model";
+import { userModel } from "../../users/user.model";
 import { eq } from "drizzle-orm";
 
 export const registerSchema = z
@@ -17,9 +17,9 @@ export const registerSchema = z
   .refine(
     async ({ email }) => {
       const res = await db
-        .select({ id: user.id })
-        .from(user)
-        .where(eq(user.email, email))
+        .select({ id: userModel.id })
+        .from(userModel)
+        .where(eq(userModel.email, email))
         .execute();
       return res.length === 0;
     },

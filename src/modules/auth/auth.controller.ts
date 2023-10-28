@@ -10,7 +10,7 @@ import { verifyUserSchema } from "./schemas/verify-user.schema";
 import { BadRequestException } from "../../exceptions/bad-request.exception";
 import { loginSchema } from "./schemas/login.schema";
 import { compare } from "bcrypt";
-import { User } from "../users/users.model";
+import { User } from "../users/user.model";
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const data = await registerSchema.parseAsync(req.body);

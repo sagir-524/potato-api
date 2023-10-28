@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "bdfd35f8-2651-421f-b50f-5454b7f68b81",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "de5326aa-f390-42f0-9928-71ef0e5e41d4",
+  "prevId": "bdfd35f8-2651-421f-b50f-5454b7f68b81",
   "tables": {
     "roles": {
       "name": "roles",
@@ -210,6 +210,13 @@
         },
         "is_admin": {
           "name": "is_admin",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "is_super_admin": {
+          "name": "is_super_admin",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
