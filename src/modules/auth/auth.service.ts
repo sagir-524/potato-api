@@ -5,6 +5,9 @@ import { redis } from "../../redis";
 import { User, userModel } from "../users/user.model";
 import { init } from "@paralleldrive/cuid2";
 import jwt from "jsonwebtoken";
+import { getUser } from "../users/users.service";
+import { NotFoundException } from "../../exceptions/not-found.exception";
+import { BadRequestException } from "../../exceptions/bad-request.exception";
 
 export const sendUserVerificationMail = async (user: User): Promise<void> => {
   const cuid = init({ length: 32 })();
@@ -63,10 +66,31 @@ export const getTokens = async (user: User) => {
   });
 
   await redis.setex(
-    `user:${user.id}:refresh-token:${token}`,
+    `user:${user.id}:refresh-token:${refreshToken}`,
     60 * 60 * 24 * 2,
     user.email
   );
 
   return { token, refreshToken, user };
+};
+
+export const getTokenViaRefreshToken = async (refreshToken: string) => {
+  const { id } = jwt.verify(refreshToken, process.env.JWT_SECRET as string) as {
+    id: number;
+  };
+  const user = await getUser("id", id);
+
+  if (!user) {
+    throw new NotFoundException("User not found");
+  }
+
+  const redisKey = `user:${id}:refresh-token:${refreshToken}`;
+  const email = await redis.get(redisKey);
+
+  if (!email || email !== user.email) {
+    throw new BadRequestException("Invalid token");
+  }
+
+  await redis.del(redisKey);
+  return await getTokens(user);
 };

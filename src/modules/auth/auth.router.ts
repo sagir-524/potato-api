@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   login,
   profile,
+  refreshTokens,
   register,
   resendVerificationEmail,
   verify,
@@ -19,5 +20,6 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   profile
 );
+router.post("/refresh-tokens", refreshTokens);
 
 export const authRouter = router;
