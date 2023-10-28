@@ -6,11 +6,13 @@ import cors from "cors";
 import morgan from "morgan";
 import { errorLogHandler } from "./exceptions/handlers/error-log.handler";
 import { zodErrorhandler } from "./exceptions/handlers/zod-error.handler";
-import { authRouter } from "./modules/auth/auth.routes";
+import { authRouter } from "./modules/auth/auth.router";
 import { defaultErrorHandler } from "./exceptions/handlers/default-error.handler";
 import { NotFoundException } from "./exceptions/not-found.exception";
 import passport from "passport";
 import { jwtStrategy } from "./modules/auth/strategies/jwt.strategy";
+import { isAdmin } from "./middlewares/admin.middleware";
+import { rolesRouter } from "./modules/roles/roles.router";
 
 dotenv.config();
 
@@ -28,6 +30,9 @@ app.use(passport.initialize());
 
 app.get("/ping", (req: Request, res: Response) => res.send("pong"));
 app.use("/auth", authRouter);
+
+app.use('/admin/roles', isAdmin, rolesRouter);
+
 app.all("*", () => {
   throw new NotFoundException();
 });

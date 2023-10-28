@@ -9,31 +9,36 @@ import { and, eq, inArray } from "drizzle-orm";
 import { User } from "../modules/users/user.model";
 import { ForbiddenException } from "../exceptions/forbidder.exception";
 
-export const checkPermission = (permissions: string[]): RequestHandler => {
+export const checkPermissions = (permissions: string[]): RequestHandler => {
   return async (req: Request, res: Response, next: NextFunction) => {
     if (req.user) {
-      const { id } = req.user as User;
-      const result = await db
-        .select({ slug: permissionModel.slug })
-        .from(roleToUserModel)
-        .innerJoin(
-          permissionToRoleModel,
-          eq(roleToUserModel.roleId, permissionToRoleModel.roleId)
-        )
-        .innerJoin(
-          permissionModel,
-          eq(permissionModel.id, permissionToRoleModel.permissionId)
-        )
-        .where(
-          and(
-            eq(roleToUserModel.userId, id),
-            inArray(permissionModel.slug, permissions)
-          )
-        )
-        .execute();
+      const { id, isAdmin, isSuperAdmin } = req.user as User;
 
-      if (result.length === permissions.length) {
+      if (isSuperAdmin) {
         next();
+      } else if (isAdmin) {
+        const result = await db
+          .select({ slug: permissionModel.slug })
+          .from(roleToUserModel)
+          .innerJoin(
+            permissionToRoleModel,
+            eq(roleToUserModel.roleId, permissionToRoleModel.roleId)
+          )
+          .innerJoin(
+            permissionModel,
+            eq(permissionModel.id, permissionToRoleModel.permissionId)
+          )
+          .where(
+            and(
+              eq(roleToUserModel.userId, id),
+              inArray(permissionModel.slug, permissions)
+            )
+          )
+          .execute();
+
+        if (result.length === permissions.length) {
+          next();
+        }
       }
     }
 
