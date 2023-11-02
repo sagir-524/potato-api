@@ -35,10 +35,12 @@ export const verifyUser = async (
       return false;
     }
 
-    const keys = await redis.keys(`user:${id}:verify:*`);
-    const pipeline = redis.pipeline();
-    keys.forEach((key) => pipeline.del(key));
-    await pipeline.exec();
+    // deleting all keys and not waiting for them
+    redis.keys(`user:${id}:verify:*`).then((keys) => {
+      const pipeline = redis.pipeline();
+      keys.forEach((key) => pipeline.del(key));
+      pipeline.exec();
+    });
 
     return true;
   }
