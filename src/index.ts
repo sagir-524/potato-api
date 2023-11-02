@@ -25,10 +25,15 @@ app.use(helmet());
 app.use(cors());
 app.use(morgan("tiny"));
 
+app.set('trust proxy', true);
+
 passport.use(jwtStrategy);
 app.use(passport.initialize());
 
-app.get("/ping", (req: Request, res: Response) => res.send("pong"));
+app.get("/ping", (req: Request, res: Response) => {
+  console.log(req.ips, req.ip, req.headers);
+  res.status(200).send("pong")
+});
 app.use("/auth", authRouter);
 
 app.use(

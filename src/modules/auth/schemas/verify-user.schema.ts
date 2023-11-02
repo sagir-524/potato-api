@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { getEmailValidator } from "../../../helpers/schema-helpers";
 
 export const verifyUserSchema = z.object({
-  email: z.string().trim().email(),
+  email: getEmailValidator(),
   code: z.string().trim().length(32),
 });

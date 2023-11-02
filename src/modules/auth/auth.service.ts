@@ -1,11 +1,10 @@
-import { eq, sql } from "drizzle-orm";
-import { db } from "../../db";
+import { sql } from "drizzle-orm";
 import { mailQueue } from "../../queues/mail.queue";
 import { redis } from "../../redis";
-import { User, userModel } from "../users/user.model";
+import { User } from "../users/user.model";
 import { init } from "@paralleldrive/cuid2";
 import jwt from "jsonwebtoken";
-import { getUser } from "../users/users.service";
+import { getUser, updateUser } from "../users/users.service";
 import { NotFoundException } from "../../exceptions/not-found.exception";
 import { BadRequestException } from "../../exceptions/bad-request.exception";
 
@@ -23,26 +22,25 @@ export const sendUserVerificationMail = async (user: User): Promise<void> => {
 };
 
 export const verifyUser = async (
-  { id, email }: User,
+  user: User,
   cuid: string
 ): Promise<boolean> => {
+  const { id, email } = user;
   const res = await redis.get(`user:${id}:verify:${cuid}`);
 
   if (res === email) {
-    const dbRes = await db
-      .update(userModel)
-      .set({ verifiedAt: sql`now()`, updatedAt: sql`now()` })
-      .where(eq(userModel.id, id))
-      .returning()
-      .execute();
+    const updatedUser = await updateUser(user, { verifiedAt: sql`now()` })
+
+    if (!updatedUser) {
+      return false;
+    }
 
     const keys = await redis.keys(`user:${id}:verify:*`);
-    console.log(keys);
     const pipeline = redis.pipeline();
     keys.forEach((key) => pipeline.del(key));
     await pipeline.exec();
 
-    return dbRes.length === 1;
+    return true;
   }
 
   return false;

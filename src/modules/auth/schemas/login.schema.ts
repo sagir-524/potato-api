@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { getEmailValidator, getPasswordValidator } from "../../../helpers/schema-helpers";
 
 export const loginSchema = z.object({
-  email: z.string().trim().email(),
-  password: z.string().trim().min(6).max(16),
+  email: getEmailValidator(),
+  password: getPasswordValidator(),
 });
