@@ -5,13 +5,12 @@ import { getUser } from "../users/users.service";
 import { NotFoundException } from "../../exceptions/not-found.exception";
 import { sendPasswordResetEmail, updateUserPassword } from "./password.service";
 import { resetPasswordSchema } from "./schemas/reset-password.schema";
+import { getPasswordValidator } from "../../helpers/schema-helpers";
 
 export const requestPasswordReset = asyncHandler(
   async (req: Request, res: Response) => {
     const { email } = await z
-      .object({
-        email: z.string().trim().email(),
-      })
+      .object({ email: getPasswordValidator() })
       .parseAsync(req.body);
 
     const user = await getUser("email", email);
