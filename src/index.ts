@@ -13,6 +13,7 @@ import passport from "passport";
 import { jwtStrategy } from "./modules/auth/strategies/jwt.strategy";
 import { isAdmin } from "./middlewares/admin.middleware";
 import { rolesRouter } from "./modules/roles/roles.router";
+import { passwordRouter } from "./modules/password/password.router";
 
 dotenv.config();
 
@@ -34,7 +35,9 @@ app.get("/ping", (req: Request, res: Response) => {
   console.log(req.ips, req.ip, req.headers);
   res.status(200).send("pong")
 });
+
 app.use("/auth", authRouter);
+app.use('/password', passwordRouter);
 
 app.use(
   "/admin/roles",
