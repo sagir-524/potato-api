@@ -5,6 +5,7 @@ import { mailQueue } from "../../queues/mail.queue";
 import { BadRequestException } from "../../exceptions/bad-request.exception";
 import { updateUser } from "../users/users.service";
 import { hashPassword } from "../../helpers/common";
+import { batchDelete } from "../../helpers/redis-helpers";
 
 export const sendPasswordResetEmail = async ({ id, email }: User) => {
   const cuid = init({ length: 48 })();
@@ -36,11 +37,6 @@ export const updateUserPassword = async (
   }
 
   // deleting all keys and not waiting for them
-  redis.keys(`user:${user.id}:reset-password:*`).then((keys) => {
-    const pipeline = redis.pipeline();
-    keys.forEach((key) => pipeline.del(key));
-    pipeline.exec();
-  });
-
+  batchDelete(`user:${user.id}:reset-password:*`);
   return true;
 };

@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import { getUser, updateUser } from "../users/users.service";
 import { NotFoundException } from "../../exceptions/not-found.exception";
 import { BadRequestException } from "../../exceptions/bad-request.exception";
+import { batchDelete } from "../../helpers/redis-helpers";
 
 export const sendUserVerificationMail = async (user: User): Promise<void> => {
   const cuid = init({ length: 32 })();
@@ -36,12 +37,7 @@ export const verifyUser = async (
     }
 
     // deleting all keys and not waiting for them
-    redis.keys(`user:${id}:verify:*`).then((keys) => {
-      const pipeline = redis.pipeline();
-      keys.forEach((key) => pipeline.del(key));
-      pipeline.exec();
-    });
-
+    batchDelete(`user:${id}:verify:*`)
     return true;
   }
 
