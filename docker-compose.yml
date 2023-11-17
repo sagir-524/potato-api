@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  potato_db:
+    container_name: potato_db
+    image: postgres:16.1-alpine3.18
+    volumes:
+      - potato_db_volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DATABASE}
+    ports:
+      - 5432:5432
+
+  potato_redis:
+    container_name: potato_redis
+    image: redis:7.2.3-alpine3.18
+    volumes:
+      - potato_redis_volume:/data
+    ports:
+      - 6379:6379
+
+  potato_api:
+    container_name: potato_api
+    restart: always
+    depends_on:
+      - potato_db
+      - potato_redis
+    build:
+      context: .
+      target: dependencies
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    env_file:
+      - .env
+    environment:
+      - PG_HOST=potato_db
+      - REDIS_HOST=potato_redis
+    volumes:
+      - ./:/home/node/app
+    command: npm run dev
+
+volumes:
+  potato_db_volume:
+  potato_redis_volume:

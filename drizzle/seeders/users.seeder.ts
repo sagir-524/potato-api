@@ -12,7 +12,7 @@ export function run () {
       {
         name: "Sagir Hossain",
         email: "sagir.hossain.524@gmail.com",
-        password: hashSync("123456", 10),
+        password: hashSync('123456', 10),
         isAdmin: true,
         isSuperAdmin: true,
         verifiedAt: sql`now()`,

@@ -8,13 +8,12 @@ import { permissionModel, permissionToRoleModel } from "../modules/permissions/p
 dotenv.config();
 
 const pool = new Pool({
-  host: process.env.PG_HOST,
-  port: Number(process.env.PG_PORT || 5432),
+  host: (process.env.PG_HOST || 'localhost'),
+  port: Number(process.env.PG_PORT),
   user: process.env.PG_USER,
   password: process.env.PG_PASSWORD,
   database: process.env.PG_DATABASE,
   max: 5,
-  ssl: true,
 });
 
 pool.on("connect", () => console.log("PG connected"));
